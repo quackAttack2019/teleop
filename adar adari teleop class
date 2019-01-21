@@ -1,48 +1,79 @@
 package org.firstinspires.ftc.teamcode;
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import com.qualcomm.robotcore.hardware.CRServo;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+import org.firstinspires.ftc.teamcode.PID;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import org.firstinspires.ftc.robotcore.external.Func;
+import com.qualcomm.robotcore.hardware.GyroSensor;
+import com.qualcomm.robotcore.hardware.Gyroscope;
 
 
-public class teleop {
-    DcMotor BL, BR, FL, FR, Armlow, Armlow1, Armhigh;
-    //CRServo Collect;
-    teleop (DcMotor BL, DcMotor BR, DcMotor FL, DcMotor FR/*,DcMotor Armlow, DcMotor Armlow1, DcMotor Armhigh, CRServo Collect*/){
-        this.BL = BL;
-        this.BR = BR;
-        this.FL = FL;
-        this.FR = FR;
-        //this.Collect = Collect;
-        //this.Armlow = Armlow;
-        //this.Armhigh = Armhigh;
-        //this.Armlow1 = Armlow1;
-    }
+@Autonomous(name = "just drive already!", group = "Autonomous")
+public class Auto extends LinearOpMode {
+    BNO055IMU imu;
+    Orientation angles;
+    DcMotor LB,LF,RB,RF;
+    double current, LBP,LFP,RBP,RFP;
+    @Override
+    public void runOpMode() {
 
-    //a -> drive straight
-    //b -> turn
-    //c -> mecanum
-    void drive(double a, double b, double c){
-            a *= 0.8;
-            b *= 0.8;
-            c *= 0.8;
-            this.FL.setPower(a - b + c);
-            this.BL.setPower(a - b - c);
-            this.FR.setPower(a + b + c);
-            this.BR.setPower(a + b - c);
+        PID pid_gyro = new PID(2, 0.01,  0.04,0);
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.RADIANS;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json";
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "IMU";
+
+
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+
+
+        waitForStart();
+
+        imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
+        LB = hardwareMap.dcMotor.get("BL");
+        RB = hardwareMap.dcMotor.get("BR");
+        LF = hardwareMap.dcMotor.get("FL");
+        RF = hardwareMap.dcMotor.get("FR");
+        LB.setDirection(DcMotor.Direction.REVERSE);
+        LF.setDirection(DcMotor.Direction.REVERSE);
+        while (opModeIsActive()) {
+            angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
+            current = angles.firstAngle;
+            double fix = pid_gyro.fix(current, 0);
+            drive(0.90, fix, 0);
+            telemetry.addData("fix", fix);
+            telemetry.update();
+            idle();
         }
-    /*void move_arm(double y_left, double y_right){
-       this.Armlow.setDirection(DcMotor.Direction.REVERSE);
-        this.Armlow.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        this.Armlow1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        this.Armhigh.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //this.Collect.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        this.Armlow.setPower(Range.clip(y_left * 0.6, -1.0, 1.0));
-        this.Armlow1.setPower(Range.clip(y_left * 0.6, -1.0, 1.0));
-        this.Armhigh.setPower(Range.clip(y_right * 0.7, -1.0, 1.0));
+}
+
+
+    public void drive(double a, double b, double c){
+        LFP = a - b + c;
+        LBP = a - b - c;
+        RFP = a + b - c;
+        RBP = a + b + c;
+        LF.setPower(LFP);
+        LB.setPower(LBP);
+        RF.setPower(RFP);
+        RB.setPower(RBP);
+
     }
-    void CollectM(double colt){
-        this.Collect.setPower(colt);
-    }*/
-
-
 }
