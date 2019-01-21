@@ -1,0 +1,48 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
+
+public class teleop {
+    DcMotor BL, BR, FL, FR, Armlow, Armlow1, Armhigh;
+    //CRServo Collect;
+    teleop (DcMotor BL, DcMotor BR, DcMotor FL, DcMotor FR/*,DcMotor Armlow, DcMotor Armlow1, DcMotor Armhigh, CRServo Collect*/){
+        this.BL = BL;
+        this.BR = BR;
+        this.FL = FL;
+        this.FR = FR;
+        //this.Collect = Collect;
+        //this.Armlow = Armlow;
+        //this.Armhigh = Armhigh;
+        //this.Armlow1 = Armlow1;
+    }
+
+    //a -> drive straight
+    //b -> turn
+    //c -> mecanum
+    void drive(double a, double b, double c){
+            a *= 0.8;
+            b *= 0.8;
+            c *= 0.8;
+            this.FL.setPower(a - b + c);
+            this.BL.setPower(a - b - c);
+            this.FR.setPower(a + b + c);
+            this.BR.setPower(a + b - c);
+        }
+    /*void move_arm(double y_left, double y_right){
+       this.Armlow.setDirection(DcMotor.Direction.REVERSE);
+        this.Armlow.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.Armlow1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.Armhigh.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //this.Collect.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        this.Armlow.setPower(Range.clip(y_left * 0.6, -1.0, 1.0));
+        this.Armlow1.setPower(Range.clip(y_left * 0.6, -1.0, 1.0));
+        this.Armhigh.setPower(Range.clip(y_right * 0.7, -1.0, 1.0));
+    }
+    void CollectM(double colt){
+        this.Collect.setPower(colt);
+    }*/
+
+
+}
