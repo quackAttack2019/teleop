@@ -1,0 +1,72 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+
+import java.sql.Time;
+import java.util.concurrent.TimeUnit;
+
+
+public class teleop {
+    DcMotor BL, BR, FL, FR, Armlow, Armhigh, maalit, maalit1;
+    Servo P;
+    teleop (DcMotor BL, DcMotor BR, DcMotor FL, DcMotor FR,DcMotor Armlow, DcMotor Armhigh, DcMotor maalit, DcMotor maalit1){
+        this.BL = BL;
+        this.BR = BR;
+        this.FL = FL;
+        this.FR = FR;
+        this.Armlow = Armlow;
+        this.Armhigh = Armhigh;
+        this.maalit = maalit;
+        this.maalit1 = maalit1;
+    }
+
+    //a -> drive straight
+    //b -> turn
+    //c -> mecanum
+
+    void drive(double a, double b, double c){
+        this.FL.setPower(a - b + c);
+        this.BL.setPower(a - b - c);
+        this.FR.setPower(a + b - c);
+        this.BR.setPower(a + b + c);
+    }
+
+    void move_armlow(double left_trigger , double right_trigger){
+        double Arm_power = (left_trigger - right_trigger) * 0.55;
+        this.Armlow.setPower(Arm_power);
+    }
+
+    void move_maalit(double leftstick_x, double left_stick_y, double right_stick_y, double left_trigger, double right_trigger){
+        this.maalit1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.maalit.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        /* maalit.setPower(-left_trigger);
+        maalit.setPower(right_trigger);
+        maalit1.setPower(-left_trigger);
+        maalit1.setPower(right_trigger);
+        */
+        /*
+        maalit.setPower(left_trigger / left_trigger);
+        maalit1.setPower(left_trigger / left_trigger);
+        maalit.setPower(-(right_trigger / right_trigger));
+        maalit1.setPower(-(right_trigger / right_trigger));
+        */
+        maalit.setPower(left_stick_y);
+        maalit1.setPower(right_stick_y);
+    }
+    void move_servo (boolean a) throws InterruptedException {
+        if(a) {
+            this.P.setPosition(0.5);
+            Thread.sleep(1000);
+            this.P.setPosition(1);
+        }
+    }
+    void move_collect(boolean y , boolean x){
+        if(y){
+            Armhigh.setPower(-0.76);
+        } else if(x){
+            Armhigh.setPower(0);
+        }
+    }
+}
