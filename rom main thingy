@@ -1,0 +1,96 @@
+package org.firstinspires.ftc.teamcode;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+
+@TeleOp(name = "Main_Thingy2.0", group = "TELE_OP")
+public class Main_Thing extends LinearOpMode {
+    DcMotor Armlow;
+    DcMotor Armhigh;
+    DcMotor maalit;
+    DcMotor maalit1;
+    //defining the variables we are gonna use
+    DcMotor leftFMotor;
+    DcMotor rightFMotor;
+    DcMotor leftBMotor;
+    DcMotor rightBMotor;
+
+    Servo P;
+
+    float arm_speed = (float) 0.5;
+    double leftFPower, rightFPower,leftBPower, rightBPower, xValue, yValue, righty, rightx,armPower;
+
+    //here we define all the methods we need.
+    // we wrote the code like this so that it's more readable and organized
+
+    //public void drive_straight(float current, float target){
+
+    //}
+    public void get_values(){
+        rightx = -gamepad1.right_stick_x;
+        armPower = gamepad2.right_stick_x;
+        yValue = gamepad1.left_stick_y;
+        xValue = gamepad1.left_stick_x;
+        leftFPower = yValue - xValue + rightx;
+        rightFPower = yValue + xValue - rightx;
+        leftBPower = yValue - xValue - rightx;
+        rightBPower = yValue + xValue + rightx;
+    }
+
+    @Override
+    public void runOpMode() throws InterruptedException {
+        leftFMotor = hardwareMap.dcMotor.get("FL");
+        rightFMotor = hardwareMap.dcMotor.get("FR");
+        leftBMotor = hardwareMap.dcMotor.get("BL");
+        rightBMotor = hardwareMap.dcMotor.get("BR");
+        Armlow = hardwareMap.dcMotor.get("AB");
+        Armhigh = hardwareMap.dcMotor.get("AH");
+        maalit = hardwareMap.dcMotor.get("M");
+        maalit1 = hardwareMap.dcMotor.get("M1");
+        P = hardwareMap.servo.get("P");
+        teleop robot = new teleop(leftBMotor, rightBMotor, leftFMotor, rightFMotor, Armlow, Armhigh, maalit, maalit1);
+        leftFMotor.setDirection(DcMotor.Direction.REVERSE);
+        leftBMotor.setDirection(DcMotor.Direction.REVERSE);
+        leftFMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Armlow.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Armhigh.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftFMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        telemetry.addData("Mode", "waiting");
+        telemetry.update();
+        // wait for start button.
+        waitForStart();
+        while (opModeIsActive()) {
+            //get_values();
+            //moving all the motors that are supposed to be move
+            robot.drive(-gamepad1.left_stick_y, -gamepad1.right_stick_x, -gamepad1.left_stick_x);
+            robot.move_armlow(gamepad2.left_trigger, gamepad2.right_trigger);
+            robot.move_maalit(gamepad2.left_stick_x, gamepad2.left_stick_y, gamepad2.right_stick_y, gamepad2.left_trigger, gamepad2.right_trigger);
+            if(gamepad2.a){
+                P.setPosition(0.5);
+                sleep(1000);
+                P.setPosition(1);
+            }
+            if(gamepad2.y){
+                Armhigh.setPower(-1);
+            }
+            else if(gamepad2.x){
+                Armhigh.setPower(0);
+            }
+            telemetry.addData("Mode", "running");
+            telemetry.addData("FL: ", leftFMotor.getCurrentPosition());
+            telemetry.addData("FR: ", rightFMotor.getCurrentPosition());
+            telemetry.addData("BL: ", leftBMotor.getCurrentPosition());
+            telemetry.addData("BR: ", rightBMotor.getCurrentPosition());
+            telemetry.update();
+            idle();
+
+        }
+    }
+}
