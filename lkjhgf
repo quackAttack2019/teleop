@@ -1,0 +1,96 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+//import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.DcMotor;
+//import org.firstinspires.ftc.robotcore.external.Func;
+//import com.qualcomm.robotcore.hardware.GyroSensor;
+//import com.qualcomm.robotcore.hardware.Gyroscope;
+import org.firstinspires.ftc.teamcode.teleop;
+
+@TeleOp(name = "Main_Thingy2.0", group = "TELE_OP")
+public class Main_Thing extends LinearOpMode {
+    DcMotor Armhigh;
+    DcMotor Armlow1;
+    CRServo Collect;
+    //defining the variables we are gonna use
+    DcMotor maalit;
+    DcMotor leftFMotor;
+    DcMotor rightFMotor;
+    DcMotor leftBMotor;
+    DcMotor rightBMotor;
+    DcMotor Armlow;
+    DcMotor maalit1;
+    float arm_speed = (float) 0.5;
+    double leftFPower, rightFPower,leftBPower, rightBPower, xValue, yValue, righty, rightx,armPower;
+    private Servo P;
+
+    //here we define all the methods we need.
+    // we wrote the code like this so that it's more readable and organized
+
+    //public void drive_straight(float current, float target){
+
+    //}
+    public void get_values(){
+        rightx = -gamepad1.right_stick_x;
+        armPower = gamepad2.right_stick_x;
+        yValue = gamepad1.left_stick_y;
+        xValue = gamepad1.left_stick_x;
+        leftFPower = yValue - xValue + rightx;
+        rightFPower = yValue + xValue - rightx;
+        leftBPower = yValue - xValue - rightx;
+        rightBPower = yValue + xValue + rightx;
+    }
+
+    @Override
+    public void runOpMode() throws InterruptedException {
+        leftFMotor = hardwareMap.dcMotor.get("FL");
+        rightFMotor = hardwareMap.dcMotor.get("FR");
+        leftBMotor = hardwareMap.dcMotor.get("BL");
+        rightBMotor = hardwareMap.dcMotor.get("BR");
+        Armlow = hardwareMap.dcMotor.get("AB");
+        Armhigh = hardwareMap.dcMotor.get("AH");
+        maalit = hardwareMap.dcMotor.get("M");
+        maalit1 = hardwareMap.dcMotor.get("M1");
+        P = hardwareMap.servo.get("P");
+        teleop robot = new teleop(leftBMotor, rightBMotor, leftFMotor, rightFMotor, Armlow, Armhigh, maalit, maalit1);
+        leftFMotor.setDirection(DcMotor.Direction.REVERSE);
+        leftBMotor.setDirection(DcMotor.Direction.REVERSE);
+        telemetry.addData("Mode", "waiting");
+        telemetry.update();
+        // wait for start button.
+        waitForStart();
+        while (opModeIsActive()) {
+            //get_values();
+            //moving all the motors that are supposed to be move
+            robot.drive(-gamepad1.left_stick_y, -gamepad1.right_stick_x, -gamepad1.left_stick_x);
+            robot.move_armlow(gamepad2.left_trigger, gamepad2.right_trigger);
+            robot.move_maalit(gamepad2.left_stick_x, gamepad2.left_stick_y, gamepad2.right_stick_y, gamepad2.left_trigger, gamepad2.right_trigger);
+            robot.move_servo(gamepad2.a);
+            robot.move_collect(gamepad2.y , gamepad2.x);
+
+//            maalit.setPower(gamepad2.left_stick_y * 0.8);
+//            maalit1.setPower(gamepad2.left_stick_y * 0.7);
+//
+//            maalit.setPower(gamepad2.right_stick_y * 0.7);
+//            maalit1.setPower(gamepad2.right_stick_y * 0.8);
+
+            //maalit.setPower(-gamepad2.left_stick_y);
+            //robot.move_arm(gamepad2.left_stick_x, gamepad2.right_stick_y);
+            //robot.move_arm(gamepad2.left_stick_x, gamepad2.right_stick_y);
+            telemetry.addData("Mode", "running");
+            telemetry.addData("maalit", gamepad2.right_stick_y);
+            telemetry.addData("mech", gamepad2.left_stick_y);
+            telemetry.addData("front = ", gamepad1.left_stick_y);
+            telemetry.addData("rotate: ", gamepad1.left_stick_x);
+            telemetry.addData("mecanum: ", gamepad1.right_stick_x);
+            telemetry.addData("arm power",armPower);
+            telemetry.update();
+            idle();
+        }
+    }
+}
