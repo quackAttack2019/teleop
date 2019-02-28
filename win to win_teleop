@@ -1,0 +1,66 @@
+package main.java.org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+
+
+public class teleop {
+    DcMotor BL, BR, FL, FR, Armlow, Armhigh, maalit, collect;
+    Servo P;
+    teleop (DcMotor BL, DcMotor BR, DcMotor FL, DcMotor FR,DcMotor Armlow, DcMotor Armhigh, DcMotor maalit, DcMotor collect){
+        this.BL = BL;
+        this.BR = BR;
+        this.FL = FL;
+        this.FR = FR;
+        this.Armlow = Armlow;
+        this.Armhigh = Armhigh;
+        this.maalit = maalit;
+        this.collect = collect;
+    }
+
+    //a -> drive straight
+    //b -> turn
+    //c -> mecanum
+
+    void drive(double a, double b, double c){
+        this.FL.setPower(a - b + c);
+        this.BL.setPower(a - b - c);
+        this.FR.setPower(a + b - c);
+        this.BR.setPower(a + b + c);
+    }
+
+    void move_Tlia(double left_trigger, double right_trigger){
+        this.maalit.setPower(right_trigger - left_trigger);
+    }
+
+    void move_armlow(double left_stick){
+        this.Armlow.setPower(left_stick);
+    }
+
+    void move_armhigh(double right_stick){
+        this.Armhigh.setPower(right_stick);
+    }
+
+    void move_servo (boolean a , boolean b , boolean x){
+        if(a) {
+            this.P.setPosition(1);
+        }
+        else if(b){
+            this.P.setPosition(0);
+        }
+        else if(x){
+            this.P.setPosition(0.2);
+        }
+    }
+    void move_collect(boolean left_bumper , boolean right_bumper){
+        if(left_bumper){
+            this.collect.setPower(0.8);
+        }
+        else if(right_bumper){
+            this.collect.setPower(-0.8);
+        }
+        else{
+            this.collect.setPower(0);
+        }
+    }
+}
